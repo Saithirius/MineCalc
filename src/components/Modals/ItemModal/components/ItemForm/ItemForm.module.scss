@@ -1,0 +1,55 @@
+.form {
+  flex: 1 0 0;
+  margin-right: -20px;
+  padding-right: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  & :global(.skb_input-container):has(input[type="number"]) {
+    width: 72px;
+  }
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+}
+
+.nameInput {
+  grid-column-start: 1;
+  grid-column-end: 3;
+}
+
+.subTitle {
+  grid-column-start: 1;
+  grid-column-end: 4;
+
+  margin-top: 16px;
+
+  display: flex;
+  gap: 8px;
+}
+
+.ingredients {
+  margin-right: -20px;
+  padding-right: 20px;
+  overflow: auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .removeBtn {
+    width: min-content;
+    height: 40px;
+    margin-top: auto;
+    margin-left: auto;
+    --svg-color: var(--color-gray-400);
+  }
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+}

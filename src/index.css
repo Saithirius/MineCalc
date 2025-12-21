@@ -1,0 +1,24 @@
+body {
+  margin: 0;
+
+  --body-bg: var(--color-gray-200);
+  background: var(--body-bg);
+
+  font-family: Onest, Arial, Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  user-select: none;
+}
+
+textarea {
+  height: 100%;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
