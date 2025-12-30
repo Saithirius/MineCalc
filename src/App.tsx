@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { ModalProvider, NotificationManager } from 'skb_uikit';
+import { Button, ModalProvider, NotificationManager } from 'skb_uikit';
 import { PageLayout } from './components/PageLayout/PageLayout';
 import { ItemsGrid } from './pages/ItemsGrid/ItemsGrid';
 import { Item } from './pages/Item/Item';
@@ -23,7 +23,17 @@ export const App: React.FC = () => {
             <Route path={'/'} element={<ItemsGrid />} />
             <Route path={'/:id'} element={<Item />} />
           </Route>
-          <Route path={'/*'} element={'Нет такой страницы'} />
+          <Route
+            path={'/*'}
+            element={
+              <div>
+                <h1>Нет такой страницы</h1>
+                <a href={'/'}>
+                  <Button>На главную</Button>
+                </a>
+              </div>
+            }
+          />
         </Routes>
       </ModalProvider>
       <NotificationManager />

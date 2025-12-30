@@ -1,13 +1,15 @@
 import React, { useEffect, useId } from 'react';
 import styles from './ItemForm.module.scss';
-import { BinSVG, Button, Input, PlusSVG, Refresh_spinningSVG, useModal, useStateBool } from 'skb_uikit';
+import { BinSVG, Button, Input, PlusSVG, Refresh_spinningSVG, useModal } from 'skb_uikit';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { apiClient } from 'api/API';
 import { Item } from 'types/items';
 import { ItemModal } from 'components/Modals/ItemModal/ItemModal';
 import { ItemSelect } from 'components/ItemSelect/ItemSelect';
 
-export type ItemForm = Omit<Item, 'id' | 'ingredients'> & { ingredients: { id: string; name: string; quantity: string }[] };
+type ItemFormIngredient = Omit<Item, 'crafted_quantity' | 'ingredients'>;
+
+export type ItemForm = Omit<Item, 'id' | 'ingredients'> & { ingredients: ItemFormIngredient[] | null };
 
 type ItemFormProps = {
   onSave: (data: ItemForm) => void;
@@ -54,19 +56,27 @@ export const ItemForm: React.FC<ItemFormProps> = ({ onSave, defaultValues, foote
             )}
           />
           <Controller
-            name={'quantity'}
+            name={'crafted_quantity'}
             control={control}
             rules={{ required: true }}
-            render={({ field, formState }) => (
-              <Input
-                label={'Кол-во'}
-                value={field.value ?? ''}
-                onChangeEvent={field.onChange}
-                type={'number'}
-                autoComplete={'off'}
-                error={!!formState?.errors?.quantity}
-              />
-            )}
+            render={({ field, formState }) => {
+              const onChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+                const value = e.target.value;
+                if (value === '' || isNaN(Number(value))) field.onChange('');
+                else field.onChange(Number(value));
+              };
+
+              return (
+                <Input
+                  label={'Кол-во'}
+                  value={field.value?.toString() ?? ''}
+                  onChangeEvent={onChange}
+                  type={'number'}
+                  autoComplete={'off'}
+                  error={!!formState?.errors?.crafted_quantity}
+                />
+              );
+            }}
           />
         </div>
 
@@ -105,19 +115,27 @@ export const ItemForm: React.FC<ItemFormProps> = ({ onSave, defaultValues, foote
                     />
                     <Controller
                       key={field.id}
-                      name={`ingredients.${index}.quantity`}
+                      name={`ingredients.${index}.quantity_as_ingredient`}
                       control={control}
                       rules={{ required: true }}
-                      render={({ field, formState }) => (
-                        <Input
-                          label={isFirst ? 'Кол-во' : undefined}
-                          value={field.value ?? ''}
-                          onChangeEvent={field.onChange}
-                          type={'number'}
-                          autoComplete={'off'}
-                          error={!!formState?.errors?.ingredients?.[index]?.quantity}
-                        />
-                      )}
+                      render={({ field, formState }) => {
+                        const onChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+                          const value = e.target.value;
+                          if (value === '' || isNaN(Number(value))) field.onChange('');
+                          else field.onChange(Number(value));
+                        };
+
+                        return (
+                          <Input
+                            label={isFirst ? 'Кол-во' : undefined}
+                            value={field.value?.toString() ?? ''}
+                            onChangeEvent={onChange}
+                            type={'number'}
+                            autoComplete={'off'}
+                            error={!!formState?.errors?.ingredients?.[index]?.quantity_as_ingredient}
+                          />
+                        );
+                      }}
                     />
                     <Button onClick={() => remove(index)} variant={'text'} className={styles.removeBtn}>
                       <BinSVG />
@@ -126,7 +144,12 @@ export const ItemForm: React.FC<ItemFormProps> = ({ onSave, defaultValues, foote
                 );
               })}
             </div>
-            <Button onClick={() => append({ id: '', name: '', quantity: '' })} variant={'outlined'} size={'medium'} startIcon={<PlusSVG />}>
+            <Button
+              onClick={() => append({ id: '', name: '', quantity_as_ingredient: 1 })}
+              variant={'outlined'}
+              size={'medium'}
+              startIcon={<PlusSVG />}
+            >
               Добавить ингредиент
             </Button>
           </>

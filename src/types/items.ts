@@ -1,7 +1,7 @@
 export type Item = {
-  id: string;
+  id: number;
   name: string;
-  quantity: string;
-  quantity_as_ingredient?: string;
-  ingredients: Item[];
+  crafted_quantity: number;
+  quantity_as_ingredient?: number;
+  ingredients: Item[] | null;
 };

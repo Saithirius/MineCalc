@@ -18,8 +18,8 @@ export const EditItem: React.FC<NewItemProps> = ({ item, onClose }) => {
   const isLoading = isPatchingItem || isDeletingItem || isDeletingIngredients || isPostingIngredients;
 
   const onSave = async (formData: ItemFormType): Promise<void> => {
-    if (item.name !== formData.name || item.quantity !== formData.quantity) {
-      await patchItem({ id: item.id, name: formData.name, quantity: Number(formData.quantity) });
+    if (item.name !== formData.name || item.crafted_quantity !== formData.crafted_quantity) {
+      await patchItem({ id: item.id, name: formData.name, quantity: formData.crafted_quantity });
     }
 
     await deleteIngredients({ item_id: item.id });

@@ -17,24 +17,29 @@ export const apiClient = createApi({
         let search = '';
         if (args && 'search' in args) search = args.search;
 
-        const req = supabase.from('items').select();
+        const req = supabase
+          .from('items')
+          .select('id, name, quantity, ingredients!ingredients_item_id_fkey (item_id, ingredient_id, quantity)');
         if (search) req.ilike('name', `%${search}%`);
         const { data, error } = await req;
 
         if (error) return { data: [] };
 
-        return { data } as { data: Item[] };
+        return { data } as unknown as { data: Item[] };
       },
       providesTags: (result) => (result ? ['items'] : []),
     }),
 
-    getItem: build.query<Item | undefined, { id: string }>({
+    getItem: build.query<Item | undefined, { id: number }>({
       queryFn: async ({ id }) => {
-        const { data, error } = await supabase.from('items').select().eq('id', id);
-
-        if (error) return { data: undefined };
-
-        return { data: data[0] } as { data: Item };
+        const { data, error } = await supabase.rpc('get_recipe', { p_item_id: id });
+        console.log(data);
+        return { data: undefined };
+        // const { data, error } = await supabase.from('items').select().eq('id', id);
+        //
+        // if (error) return { data: undefined };
+        //
+        // return { data: data[0] } as { data: Item };
       },
       providesTags: (result, _, args) => (result ? [{ type: 'items', id: args.id }] : []),
     }),
@@ -50,7 +55,7 @@ export const apiClient = createApi({
       invalidatesTags: (_, error) => (!error ? [{ type: 'items' }] : []),
     }),
 
-    patchItem: build.mutation<Item | undefined, { id: string; name: string; quantity: number }>({
+    patchItem: build.mutation<Item | undefined, { id: number; name: string; quantity: number }>({
       queryFn: async ({ id, name, quantity }) => {
         const { data, error } = await supabase.from('items').update({ name, quantity }).eq('id', id).select();
 
@@ -61,7 +66,7 @@ export const apiClient = createApi({
       invalidatesTags: (_, error, args) => (!error ? [{ type: 'items' }, { type: 'items', id: args.id }] : []),
     }),
 
-    deleteItem: build.mutation<undefined, { id: string }>({
+    deleteItem: build.mutation<undefined, { id: number }>({
       queryFn: async ({ id }) => {
         await supabase.from('items').delete().eq('id', id);
         return { data: undefined };
@@ -69,7 +74,7 @@ export const apiClient = createApi({
       invalidatesTags: (_, error, args) => (!error ? [{ type: 'items' }, { type: 'items', id: args.id }] : []),
     }),
 
-    getIngredients: build.query<Item[], { id: string }>({
+    getIngredients: build.query<Item[], { id: number }>({
       queryFn: async ({ id }) => {
         const { data: row_ingredients, error: row_ingredients_error } = await supabase.from('ingredients').select().eq('item_id', id);
 
