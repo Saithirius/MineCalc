@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './EditItem.module.scss';
 import { ItemForm, type ItemForm as ItemFormType } from '../ItemForm/ItemForm';
 import { Button } from 'skb_uikit';
-import { Item } from 'types/items';
+import { Ingredient, Item } from 'types/items';
 import { apiClient } from 'api/API';
 
 type NewItemProps = {
@@ -19,17 +19,21 @@ export const EditItem: React.FC<NewItemProps> = ({ item, onClose }) => {
 
   const onSave = async (formData: ItemFormType): Promise<void> => {
     if (item.name !== formData.name || item.crafted_quantity !== formData.crafted_quantity) {
-      await patchItem({ id: item.id, name: formData.name, quantity: formData.crafted_quantity });
+      await patchItem({ id: item.id, name: formData.name, crafted_quantity: formData.crafted_quantity });
     }
 
     await deleteIngredients({ item_id: item.id });
 
-    if (formData.ingredients.length) {
-      const ingredients = formData.ingredients.map((ingredient) => ({
-        item_id: item.id,
-        ingredient_id: ingredient.id,
-        quantity: Number(ingredient.quantity),
-      }));
+    if (formData.ingredients?.length) {
+      const ingredients: Ingredient[] = [];
+      formData.ingredients.forEach((ingredient) => {
+        if (!ingredient.id || !ingredient.quantity_as_ingredient) return;
+        ingredients.push({
+          item_id: item.id,
+          ingredient_id: ingredient.id,
+          quantity_as_ingredient: ingredient.quantity_as_ingredient,
+        });
+      });
       await postIngredients(ingredients);
     }
 

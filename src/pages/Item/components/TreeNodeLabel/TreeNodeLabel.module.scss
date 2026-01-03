@@ -1,0 +1,33 @@
+.nodeLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  cursor: pointer;
+
+  .nodeActionsBtns {
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.2s;
+
+    & > button {
+      width: 20px;
+      height: 20px;
+      padding: 0;
+
+      border-radius: 50%;
+
+      & > svg {
+        width: 12px;
+        height: 12px;
+      }
+    }
+  }
+
+  &:hover {
+    .nodeActionsBtns {
+      opacity: 1;
+    }
+  }
+}

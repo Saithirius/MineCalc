@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styles from './ItemsGrid.module.scss';
+import styles from './Items.module.scss';
 import { Button, Input, PlusSVG, Refresh_spinningSVG, useModal, withDebouncedChange } from 'skb_uikit';
 import { ItemModal } from 'components/Modals/ItemModal/ItemModal';
 import { apiClient } from 'api/API';
@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 const InputWithDebounce = withDebouncedChange(Input);
 
-export const ItemsGrid: React.FC = () => {
+export const Items: React.FC = () => {
   const navigate = useNavigate();
 
   const itemModalState = useModal('itemModal');
@@ -20,10 +20,10 @@ export const ItemsGrid: React.FC = () => {
     <div className={styles.page}>
       <h1 style={{ marginBottom: 24 }}>Список предметов</h1>
       <InputWithDebounce onChange={(v) => setSearch(v ?? '')} placeholder={'Поиск'} autoComplete={'off'} style={{ marginBottom: 24 }} />
-      <div className={styles.grid}>
-        <Button onClick={itemModalState.openModal} variant={'outlined'}>
-          <PlusSVG />
-        </Button>
+      <Button onClick={itemModalState.openModal} variant={'outlined'} startIcon={<PlusSVG />} className={styles.addBtn}>
+        Создать новый
+      </Button>
+      <div className={styles.list}>
         {isLoading ? (
           <Refresh_spinningSVG className={styles.loader} />
         ) : (

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Button, ModalProvider, NotificationManager } from 'skb_uikit';
 import { PageLayout } from './components/PageLayout/PageLayout';
-import { ItemsGrid } from './pages/ItemsGrid/ItemsGrid';
+import { Items } from './pages/Items/Items';
 import { Item } from './pages/Item/Item';
 
 export const App: React.FC = () => {
@@ -20,7 +20,7 @@ export const App: React.FC = () => {
       <ModalProvider>
         <Routes>
           <Route element={<PageLayout />}>
-            <Route path={'/'} element={<ItemsGrid />} />
+            <Route path={'/'} element={<Items />} />
             <Route path={'/:id'} element={<Item />} />
           </Route>
           <Route

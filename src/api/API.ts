@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { Item } from 'types/items';
+import { Ingredient, Item } from 'types/items';
 import { createApi } from '@reduxjs/toolkit/query/react';
 
 const API_URL = 'https://efhzdixocsqwiuzqtaff.supabase.co';
@@ -19,7 +19,8 @@ export const apiClient = createApi({
 
         const req = supabase
           .from('items')
-          .select('id, name, quantity, ingredients!ingredients_item_id_fkey (item_id, ingredient_id, quantity)');
+          .select('id, name, crafted_quantity, ingredients!ingredients_item_id_fkey (item_id, ingredient_id, quantity_as_ingredient)')
+          .order('name');
         if (search) req.ilike('name', `%${search}%`);
         const { data, error } = await req;
 
@@ -33,20 +34,17 @@ export const apiClient = createApi({
     getItem: build.query<Item | undefined, { id: number }>({
       queryFn: async ({ id }) => {
         const { data, error } = await supabase.rpc('get_recipe', { p_item_id: id });
-        console.log(data);
-        return { data: undefined };
-        // const { data, error } = await supabase.from('items').select().eq('id', id);
-        //
-        // if (error) return { data: undefined };
-        //
-        // return { data: data[0] } as { data: Item };
+
+        if (error) return { data: undefined };
+
+        return { data } as { data: Item };
       },
       providesTags: (result, _, args) => (result ? [{ type: 'items', id: args.id }] : []),
     }),
 
-    postItem: build.mutation<Item | undefined, { name: string; quantity: number }>({
-      queryFn: async ({ name, quantity }) => {
-        const { data, error } = await supabase.from('items').insert([{ name, quantity }]).select();
+    postItem: build.mutation<Item | undefined, { name: string; crafted_quantity: number }>({
+      queryFn: async ({ name, crafted_quantity }) => {
+        const { data, error } = await supabase.from('items').insert([{ name, crafted_quantity }]).select();
 
         if (error) return { data: undefined };
 
@@ -55,9 +53,9 @@ export const apiClient = createApi({
       invalidatesTags: (_, error) => (!error ? [{ type: 'items' }] : []),
     }),
 
-    patchItem: build.mutation<Item | undefined, { id: number; name: string; quantity: number }>({
-      queryFn: async ({ id, name, quantity }) => {
-        const { data, error } = await supabase.from('items').update({ name, quantity }).eq('id', id).select();
+    patchItem: build.mutation<Item | undefined, { id: number; name: string; crafted_quantity: number }>({
+      queryFn: async ({ id, name, crafted_quantity }) => {
+        const { data, error } = await supabase.from('items').update({ name, crafted_quantity }).eq('id', id).select();
 
         if (error) return { data: undefined };
 
@@ -90,7 +88,7 @@ export const apiClient = createApi({
           data: ingredients?.map((ingredient) => {
             return {
               ...ingredient,
-              quantity_as_ingredient: row_ingredients.find((row) => row.ingredient_id === ingredient.id)?.quantity,
+              quantity_as_ingredient: row_ingredients.find((row) => row.ingredient_id === ingredient.id)?.quantity_as_ingredient,
             };
           }),
         };
@@ -98,7 +96,7 @@ export const apiClient = createApi({
       providesTags: (result, _, args) => (result ? [{ type: 'ingredients', id: args.id }] : []),
     }),
 
-    postIngredients: build.mutation<Item | undefined, { item_id: string; ingredient_id: string; quantity: number }[]>({
+    postIngredients: build.mutation<Item | undefined, Ingredient[]>({
       queryFn: async (ingredients) => {
         const { data, error } = await supabase.from('ingredients').insert(ingredients).select();
         if (error) return { data: undefined };
@@ -107,7 +105,7 @@ export const apiClient = createApi({
       invalidatesTags: (_, error, args) => (!error ? [{ type: 'ingredients', id: args[0].item_id }] : []),
     }),
 
-    deleteIngredients: build.mutation<undefined, { item_id: string }>({
+    deleteIngredients: build.mutation<undefined, { item_id: number }>({
       queryFn: async ({ item_id }) => {
         await supabase.from('ingredients').delete().eq('item_id', item_id);
         return { data: undefined };

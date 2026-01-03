@@ -1,0 +1,42 @@
+.page {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.addBtn {
+  width: max-content;
+  margin-bottom: 16px;;
+}
+
+.list {
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  & > :nth-child(n) {
+    padding: 6px 8px;
+    display: flex;
+    align-items: center;
+
+    border: 1px solid transparent;
+
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--color-gray-400);
+      border-radius: 8px;
+    }
+  }
+
+  .loader {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    border: none;
+    cursor: default;
+  }
+}

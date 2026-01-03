@@ -5,3 +5,9 @@ export type Item = {
   quantity_as_ingredient?: number;
   ingredients: Item[] | null;
 };
+
+export type Ingredient = {
+  item_id: number;
+  ingredient_id: number;
+  quantity_as_ingredient: number;
+};

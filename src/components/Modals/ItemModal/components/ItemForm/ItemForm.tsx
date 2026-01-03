@@ -7,7 +7,7 @@ import { Item } from 'types/items';
 import { ItemModal } from 'components/Modals/ItemModal/ItemModal';
 import { ItemSelect } from 'components/ItemSelect/ItemSelect';
 
-type ItemFormIngredient = Omit<Item, 'crafted_quantity' | 'ingredients'>;
+type ItemFormIngredient = Partial<Omit<Item, 'crafted_quantity' | 'ingredients'>>;
 
 export type ItemForm = Omit<Item, 'id' | 'ingredients'> & { ingredients: ItemFormIngredient[] | null };
 
@@ -103,11 +103,15 @@ export const ItemForm: React.FC<ItemFormProps> = ({ onSave, defaultValues, foote
                       control={control}
                       rules={{ required: true }}
                       render={({ field, formState }) => {
+                        const onChange = (e: React.ChangeEvent<HTMLSelectElement>): void => {
+                          field.onChange(Number(e.target.value));
+                        };
+
                         return (
                           <ItemSelect
                             label={isFirst ? 'Название' : undefined}
-                            value={field.value ?? ''}
-                            onChange={field.onChange}
+                            value={field.value}
+                            onChange={onChange}
                             error={!!formState?.errors?.ingredients?.[index]?.id}
                           />
                         );
@@ -144,12 +148,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({ onSave, defaultValues, foote
                 );
               })}
             </div>
-            <Button
-              onClick={() => append({ id: '', name: '', quantity_as_ingredient: 1 })}
-              variant={'outlined'}
-              size={'medium'}
-              startIcon={<PlusSVG />}
-            >
+            <Button onClick={() => append({})} variant={'outlined'} size={'medium'} startIcon={<PlusSVG />}>
               Добавить ингредиент
             </Button>
           </>
