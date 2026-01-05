@@ -1,16 +1,17 @@
 import React from 'react';
 import styles from './EditItem.module.scss';
-import { ItemForm, type ItemForm as ItemFormType } from '../ItemForm/ItemForm';
-import { Button } from 'skb_uikit';
 import { Ingredient, Item } from 'types/items';
 import { apiClient } from 'api/API';
+import { Button } from 'skb_uikit';
+import { ItemForm, type ItemForm as ItemFormType } from '../ItemForm/ItemForm';
 
 type NewItemProps = {
   item: Item;
   onClose: () => void;
+  onOpenNewItemModal: () => void;
 };
 
-export const EditItem: React.FC<NewItemProps> = ({ item, onClose }) => {
+export const EditItem: React.FC<NewItemProps> = ({ item, onClose, onOpenNewItemModal }) => {
   const [patchItem, { isLoading: isPatchingItem }] = apiClient.usePatchItemMutation();
   const [deleteItem, { isLoading: isDeletingItem }] = apiClient.useDeleteItemMutation();
   const [deleteIngredients, { isLoading: isDeletingIngredients }] = apiClient.useDeleteIngredientsMutation();
@@ -65,6 +66,7 @@ export const EditItem: React.FC<NewItemProps> = ({ item, onClose }) => {
           </Button>
         </div>
       }
+      onOpenNewItemModal={onOpenNewItemModal}
     />
   );
 };

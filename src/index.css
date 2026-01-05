@@ -22,3 +22,8 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+.skb_select-options {
+  max-height: 350px;
+  overflow-y: auto;
+}

@@ -4,55 +4,48 @@ import { Button, MinusSVG, PlusSVG, useModal } from 'skb_uikit';
 import { ItemModal } from 'components/Modals/ItemModal/ItemModal';
 import { ItemType } from '../../Item';
 
+export type Action = '--' | '-' | '+' | '++';
+
 type TreeNodeLabelProps = {
   item: ItemType;
-  label: ReactNode;
-  onChangeTree: (item: ItemType) => void;
+  name: ReactNode;
+  targetAmount: number;
+  onChangeAmount: (action: Action) => void;
   isRoot?: boolean;
 };
 
-export const TreeNodeLabel: React.FC<TreeNodeLabelProps> = ({ item, label, onChangeTree, isRoot }) => {
+export const TreeNodeLabel: React.FC<TreeNodeLabelProps> = ({ item, name, targetAmount, onChangeAmount, isRoot }) => {
   const id = useId();
   const editModalState = useModal(id + item.id + 'editItemModal');
 
-  const onChangeRoot = (action: '-' | '+'): void => {
-    switch (action) {
-      case '+':
-        onChangeTree({ ...item, multiple: (item.multiple ?? 0) + 1 });
-        break;
-      case '-':
-        onChangeTree({ ...item, multiple: (item.multiple ?? 0) - 1 });
-        break;
-    }
-  };
-
-  const onChangeIngredient = (action: '-' | '+'): void => {
-    switch (action) {
-      case '+':
-        onChangeTree({ ...item, have: (item.have ?? 0) + 1 });
-        break;
-      case '-':
-        onChangeTree({ ...item, have: (item.have ?? 0) - 1 });
-        break;
-    }
-  };
-
-  const onChangeCount = (action: '-' | '+'): void => {
-    if (isRoot) onChangeRoot(action);
-    else onChangeIngredient(action);
-  };
+  const label = `${item.name}: ${targetAmount % 1 != 0 ? targetAmount.toFixed(1) : targetAmount}`;
 
   return (
     <>
-      <div onClick={() => editModalState.openModal()} className={styles.nodeLabel}>
-        {label}
-        <div onClick={(e) => e.stopPropagation()} className={styles.nodeActionsBtns} style={item.have ? { opacity: 1 } : {}}>
-          {!isRoot && <span style={{ marginLeft: 16 }}>имеется: {item.have ?? 0}</span>}
-          <Button onClick={() => onChangeCount('+')} variant={'outlined'}>
-            <PlusSVG />
-          </Button>
-          <Button onClick={() => onChangeCount('-')} variant={'outlined'}>
+      <div className={styles.nodeLabel}>
+        <span onClick={() => editModalState.openModal()} style={{ cursor: 'pointer' }}>
+          {label}
+        </span>{' '}
+        {!!item.currentAmount && (
+          <span>
+            (<span className={styles.needAmount}>{targetAmount - item.currentAmount}</span>)
+          </span>
+        )}
+        <div className={styles.nodeActionsBtns} style={item.currentAmount ? { opacity: 1 } : {}}>
+          {!isRoot && <span className={styles.currentAmount}>имеется: {item.currentAmount ?? 0}</span>}
+          <Button onClick={() => onChangeAmount('--')} variant={'outlined'}>
             <MinusSVG />
+            64
+          </Button>
+          <Button onClick={() => onChangeAmount('-')} variant={'outlined'}>
+            <MinusSVG />1
+          </Button>
+          <Button onClick={() => onChangeAmount('+')} variant={'outlined'}>
+            <PlusSVG />1
+          </Button>
+          <Button onClick={() => onChangeAmount('++')} variant={'outlined'}>
+            <PlusSVG />
+            64
           </Button>
         </div>
       </div>

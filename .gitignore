@@ -1,11 +1,11 @@
-# dependencies
+# Dependencies
 /node_modules
 
-# production
-/build
-/dist
+# Build
+#/build
+# /dist
 
-# misc
+# Misc
 /.idea
 .DS_Store
 .env.dev

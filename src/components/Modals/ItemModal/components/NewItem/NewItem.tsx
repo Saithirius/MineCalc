@@ -1,15 +1,16 @@
 import React from 'react';
 import styles from './NewItem.module.scss';
-import { ItemForm, type ItemForm as ItemFormType } from '../ItemForm/ItemForm';
+import { Ingredient } from 'types/items';
 import { apiClient } from 'api/API';
 import { Button, notify } from 'skb_uikit';
-import { Ingredient } from '../../../../../types/items';
+import { ItemForm, type ItemForm as ItemFormType } from '../ItemForm/ItemForm';
 
 type NewItemProps = {
   onClose: () => void;
+  onOpenNewItemModal: () => void;
 };
 
-export const NewItem: React.FC<NewItemProps> = ({ onClose }) => {
+export const NewItem: React.FC<NewItemProps> = ({ onClose, onOpenNewItemModal }) => {
   const [postItem, { isLoading: isPostingItem }] = apiClient.usePostItemMutation();
   const [postIngredients, { isLoading: isPostingIngredients }] = apiClient.usePostIngredientsMutation();
   const isLoading = isPostingItem || isPostingIngredients;
@@ -51,6 +52,7 @@ export const NewItem: React.FC<NewItemProps> = ({ onClose }) => {
           </Button>
         </div>
       }
+      onOpenNewItemModal={onOpenNewItemModal}
     />
   );
 };

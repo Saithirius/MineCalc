@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "cross-env BROWSER=none vite",
-    "build": "vite build && node scripts/builder.js"
+    "build": "vite build"
   },
   "dependencies": {
     "@reduxjs/toolkit": "2.8.2",
