@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "start": "cross-env BROWSER=none vite",
-    "build": "vite build && npm run del_docs && npm run rename_build_to_docs",
+    "build": "vite build && npm run del_docs && npm run rename_build_to_docs && npm run rename_index_to_404",
     "del_docs": "node -e \"require('fs').rmSync('docs', { recursive: true, force: true })\"",
-    "rename_build_to_docs": "node -e \"require('fs').renameSync('build', 'docs')\""
+    "rename_build_to_docs": "node -e \"require('fs').renameSync('build', 'docs')\"",
+    "rename_index_to_404": "node -e \"require('fs').renameSync('docs/index.html', 'docs/404.html')\""
   },
   "dependencies": {
     "@reduxjs/toolkit": "2.8.2",
