@@ -1,32 +1,63 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useId } from 'react';
 import styles from './TreeNodeLabel.module.scss';
 import { Button, MinusSVG, PlusSVG, useModal } from 'skb_uikit';
 import { ItemModal } from 'components/Modals/ItemModal/ItemModal';
-import { Item } from 'types/items';
+import { ItemType } from '../../Item';
 
 type TreeNodeLabelProps = {
-  item: Item;
+  item: ItemType;
   label: ReactNode;
-  onClick: (id: number, event: '-' | '+') => void;
+  onChangeTree: (item: ItemType) => void;
+  isRoot?: boolean;
 };
 
-export const TreeNodeLabel: React.FC<TreeNodeLabelProps> = ({ item, label, onClick }) => {
-  const editModalState = useModal(item.id + 'editItemModal');
+export const TreeNodeLabel: React.FC<TreeNodeLabelProps> = ({ item, label, onChangeTree, isRoot }) => {
+  const id = useId();
+  const editModalState = useModal(id + item.id + 'editItemModal');
+
+  const onChangeRoot = (action: '-' | '+'): void => {
+    switch (action) {
+      case '+':
+        onChangeTree({ ...item, multiple: (item.multiple ?? 0) + 1 });
+        break;
+      case '-':
+        onChangeTree({ ...item, multiple: (item.multiple ?? 0) - 1 });
+        break;
+    }
+  };
+
+  const onChangeIngredient = (action: '-' | '+'): void => {
+    switch (action) {
+      case '+':
+        onChangeTree({ ...item, have: (item.have ?? 0) + 1 });
+        break;
+      case '-':
+        onChangeTree({ ...item, have: (item.have ?? 0) - 1 });
+        break;
+    }
+  };
+
+  const onChangeCount = (action: '-' | '+'): void => {
+    if (isRoot) onChangeRoot(action);
+    else onChangeIngredient(action);
+  };
 
   return (
-    <div onClick={() => editModalState.openModal()} className={styles.nodeLabel}>
-      {label}
-      <div className={styles.nodeActionsBtns} onClick={(e) => e.stopPropagation()}>
-        <Button onClick={() => onClick(item.id, '+')} variant={'outlined'}>
-          <PlusSVG />
-        </Button>
-        <Button onClick={() => onClick(item.id, '-')} variant={'outlined'}>
-          <MinusSVG />
-        </Button>
+    <>
+      <div onClick={() => editModalState.openModal()} className={styles.nodeLabel}>
+        {label}
+        <div onClick={(e) => e.stopPropagation()} className={styles.nodeActionsBtns} style={item.have ? { opacity: 1 } : {}}>
+          {!isRoot && <span style={{ marginLeft: 16 }}>имеется: {item.have ?? 0}</span>}
+          <Button onClick={() => onChangeCount('+')} variant={'outlined'}>
+            <PlusSVG />
+          </Button>
+          <Button onClick={() => onChangeCount('-')} variant={'outlined'}>
+            <MinusSVG />
+          </Button>
+        </div>
       </div>
-
       {/* Модалки */}
-      {editModalState.isOpen && <ItemModal isOpen={editModalState.isOpen} onClose={editModalState.closeModal} item={item} />}
-    </div>
+      {editModalState.isOpen && <ItemModal item={item} isOpen={editModalState.isOpen} onClose={editModalState.closeModal} />}
+    </>
   );
 };

@@ -1,25 +1,30 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styles from './Item.module.scss';
-import { Button, ChevronLeftSVG, MinusSVG, PlusSVG, Refresh_spinningSVG, useModal } from 'skb_uikit';
+import { Button, ChevronLeftSVG, Refresh_spinningSVG, useModal } from 'skb_uikit';
 import { apiClient } from 'api/API';
 import { ItemModal } from 'components/Modals/ItemModal/ItemModal';
-import { type Item as ItemType } from 'types/items';
+import { type Item as ItemBaseType } from 'types/items';
 import { Tree, TreeProps } from 'components/Tree/Tree';
 import { TreeNodeLabel } from './components/TreeNodeLabel/TreeNodeLabel';
 
-const itemToTree = (item: ItemType, multiple = 1, onClick: (id: number, event: '-' | '+') => void): TreeProps['data'] => {
-  const label = `${item.name}: ${multiple}`;
+export type ItemType = Omit<ItemBaseType, 'ingredients'> & { multiple?: number; have?: number; ingredients: ItemType[] };
+
+const itemToTree = (item: ItemType, onChangeTree: (item: ItemType) => void, multiple = 1, isRoot = true): TreeProps['data'] => {
+  multiple += item.multiple ?? 0;
+  const label = `${item.name}: ${multiple % 1 != 0 ? multiple.toFixed(1) : multiple}`;
 
   const graphData: TreeProps['data'] = {
     id: item.id,
-    label: <TreeNodeLabel item={item} label={label} onClick={onClick} />,
+    label: <TreeNodeLabel item={item} label={label} onChangeTree={onChangeTree} isRoot={isRoot} />,
     children: [],
   };
   if (!item.ingredients?.length) return graphData;
 
   item.ingredients?.forEach((ingredient) => {
-    graphData.children.push(itemToTree(ingredient, multiple * ((ingredient.quantity_as_ingredient ?? 1) / item.crafted_quantity), onClick));
+    graphData.children.push(
+      itemToTree(ingredient, onChangeTree, multiple * ((ingredient.quantity_as_ingredient ?? 1) / item.crafted_quantity), false),
+    );
   });
 
   return graphData;
@@ -41,40 +46,64 @@ const getNeedResources = (item: ItemType, multiple = 1, needResources: NeedResou
   return needResources;
 };
 
-export const Item: React.FC = () => {
+type ItemProps = {
+  item: ItemType;
+};
+
+const Item: React.FC<ItemProps> = ({ ...props }) => {
+  const editItemModalState = useModal('editItemModal');
+
+  const [item, setItem] = useState<ItemType>(props.item);
+
+  const tree = useMemo(() => {
+    if (!item) return;
+    return itemToTree(item!, setItem);
+  }, [item]);
+
+  const needResources = useMemo(() => {
+    return Object.entries(getNeedResources(item!))
+      .map(([name, value]) => ({ name, ...value }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [item]);
+
+  console.log(item);
+  return (
+    <>
+      <div className={styles.header}>
+        <h1>{item.name}</h1>
+        <Button onClick={editItemModalState.openModal}>Редактировать</Button>
+      </div>
+      <div className={styles.ingredientsBlock}>
+        <h3>Рецепт</h3>
+        {tree ? <Tree data={tree} isOpenDefault={true} /> : <div>Нет ингредиентов</div>}
+      </div>
+      <div className={styles.needResourcesBlock}>
+        <h3>Необходимо ресурсов</h3>
+        <div className={styles.needResourcesList}>
+          {needResources.map((resource) => (
+            <div key={resource.id}>
+              {resource.name}: {resource.quantity}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Модалки */}
+      {editItemModalState.isOpen && <ItemModal isOpen={true} onClose={editItemModalState.closeModal} item={item} />}
+    </>
+  );
+};
+
+const ItemContainer: React.FC = () => {
   const params = useParams();
   const id = Number(params.id);
   if (isNaN(id)) return <div>Не удалось получить ID предмета</div>;
-
   const navigate = useNavigate();
-
-  const editItemModalState = useModal('editItemModal');
-
-  const [tree, setTree] = useState<TreeProps['data']>();
-  const [multiple, setMultiple] = useState(1);
 
   const { data: item, isLoading } = apiClient.useGetItemQuery({ id: id! }, { skip: !id });
 
-  const onChangeIngredientQuantity = useRef((id: number, event: '-' | '+'): void => {
-    console.log('onClick', id, event);
-    if (id === item?.id) setMultiple(Math.max(1, multiple + (event === '-' ? -1 : 1)));
-  });
-
-  useEffect(() => {
-    if (!item) return;
-    const tree = itemToTree(item!, multiple, onChangeIngredientQuantity.current);
-    setTree(tree);
-  }, [item, multiple]);
-
-  const needResources = useMemo(() => {
-    return Object.entries(getNeedResources(item!, multiple))
-      .map(([name, value]) => ({ name, ...value }))
-      .sort((a, b) => a.name.localeCompare(b.name));
-  }, [item, multiple]);
-
   return (
-    <div>
-      <canvas id={'canvas'} style={{ opacity: 0, pointerEvents: 'none', position: 'absolute', top: 0, left: 0 }} />
+    <>
       <Button onClick={() => navigate('/')} variant={'outlined'} startIcon={<ChevronLeftSVG />} style={{ marginBottom: 24 }}>
         Список предметов
       </Button>
@@ -83,30 +112,10 @@ export const Item: React.FC = () => {
       ) : !item ? (
         <div>Нет такого предмета</div>
       ) : (
-        <>
-          <div className={styles.header}>
-            <h1>{item.name}</h1>
-            <Button onClick={editItemModalState.openModal}>Редактировать</Button>
-          </div>
-          <div className={styles.ingredientsBlock}>
-            <h3>Рецепт</h3>
-            {tree ? <Tree data={tree} isOpenDefault={true} /> : <div>Нет ингредиентов</div>}
-          </div>
-          <div className={styles.needResourcesBlock}>
-            <h3>Необходимо ресурсов</h3>
-            <div className={styles.needResourcesList}>
-              {needResources.map((resource) => (
-                <div key={resource.id}>
-                  {resource.name}: {resource.quantity}
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
+        <Item item={item as ItemType} />
       )}
-
-      {/* Модалки */}
-      {editItemModalState.isOpen && <ItemModal isOpen={true} onClose={editItemModalState.closeModal} item={item} />}
-    </div>
+    </>
   );
 };
+
+export { ItemContainer as Item };

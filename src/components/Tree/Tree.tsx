@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styles from './Tree.module.scss';
-import { Button, ChevronDownSVG, ChevronUpSVG, MinusSVG, PlusSVG } from 'skb_uikit';
+import { Button, ChevronDownSVG, ChevronUpSVG } from 'skb_uikit';
 
 type TreeNode = {
   id: number;

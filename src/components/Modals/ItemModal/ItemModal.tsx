@@ -17,7 +17,7 @@ export const ItemModal: React.FC<ItemModalProps> = ({ isOpen, onClose, item }) =
       open={isOpen}
       onClose={onClose}
       title={item ? item.name : 'Новый рецепт'}
-      showCloseBtn={false}
+      // showCloseBtn={false}
       cardClassName={styles.modal}
       contentClassName={styles.content}
     >
