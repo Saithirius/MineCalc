@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "start": "cross-env BROWSER=none vite",
-    "build": "vite build"
+    "build": "vite build && npm run del_docs && npm run rename_build_to_docs",
+    "del_docs": "node -e \"require('fs').rmSync('docs', { recursive: true, force: true })\"",
+    "rename_build_to_docs": "node -e \"require('fs').renameSync('build', 'docs')\""
   },
   "dependencies": {
     "@reduxjs/toolkit": "2.8.2",
