@@ -16,7 +16,7 @@ export const App: React.FC = () => {
   }, []);
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={'/MineCalc/'}>
       <ModalProvider>
         <Routes>
           <Route element={<PageLayout />}>
