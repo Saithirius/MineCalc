@@ -1,11 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { Button, ModalProvider, NotificationManager } from 'skb_uikit';
+import { Button, ModalProvider, NotificationManager, ThemeContext } from 'skb_uikit';
 import { PageLayout } from './components/PageLayout/PageLayout';
 import { Items } from './pages/Items/Items';
 import { Item } from './pages/Item/Item';
 
 export const App: React.FC = () => {
+  const { setTheme } = useContext(ThemeContext);
+  setTheme('light');
+
   // Отключаем прокрутку колесиком на input type="number"
   useEffect(() => {
     document.addEventListener('wheel', function (event) {
