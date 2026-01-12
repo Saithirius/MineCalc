@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import styles from './Items.module.scss';
-import { Button, Input, PlusSVG, Refresh_spinningSVG, useModal, withDebouncedChange } from 'skb_uikit';
+import { Button, Input, PlusSVG, Refresh_spinningSVG, withDebouncedChange } from 'skb_uikit';
 import { ItemModal } from 'components/Modals/ItemModal/ItemModal';
 import { apiClient } from 'api/API';
 import { useNavigate } from 'react-router-dom';
+import { useItemModalSate } from 'hooks/useItemModalSate/useItemModalSate';
 
 const InputWithDebounce = withDebouncedChange(Input);
 
 export const Items: React.FC = () => {
   const navigate = useNavigate();
 
-  const itemModalState = useModal('itemModal');
+  const itemModalState = useItemModalSate();
 
   const [search, setSearch] = useState<string>('');
 

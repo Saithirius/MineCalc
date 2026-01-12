@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styles from './Item.module.scss';
-import { Button, ChevronLeftSVG, Refresh_spinningSVG, Switch, useModal } from 'skb_uikit';
+import { Button, ChevronLeftSVG, Refresh_spinningSVG, Switch } from 'skb_uikit';
 import { apiClient } from 'api/API';
 import { ItemModal } from 'components/Modals/ItemModal/ItemModal';
 import { type Item as ItemBaseType } from 'types/items';
@@ -9,6 +9,7 @@ import { Tree } from 'components/Tree/Tree';
 import { itemToTree } from './utils/itemToTree';
 import { getNeedResources } from './utils/getNeedResources';
 import { Action } from './components/TreeNodeLabel/TreeNodeLabel';
+import { useItemModalSate } from 'hooks/useItemModalSate/useItemModalSate';
 
 export type ItemType = Omit<ItemBaseType, 'ingredients'> & { targetAmount?: number; currentAmount?: number; ingredients: ItemType[] };
 
@@ -17,7 +18,7 @@ type ItemProps = {
 };
 
 const Item: React.FC<ItemProps> = ({ ...props }) => {
-  const editItemModalState = useModal('editItemModal');
+  const editItemModalState = useItemModalSate(false);
 
   const [item, setItem] = useState<ItemType>(props.item);
   const [isStackView, setIsStackView] = useState(false);
@@ -88,7 +89,7 @@ const Item: React.FC<ItemProps> = ({ ...props }) => {
 
       {/* Если есть ингредиенты */}
       {!!item.ingredients?.length && (
-        <>
+        <div className={styles.content}>
           <div className={styles.ingredientsBlock}>
             <h3>Рецепт</h3>
             {tree ? <Tree data={tree} isOpenDefault={true} /> : <div>Нет ингредиентов</div>}
@@ -113,7 +114,7 @@ const Item: React.FC<ItemProps> = ({ ...props }) => {
               })}
             </div>
           </div>
-        </>
+        </div>
       )}
 
       {/* Модалки */}
@@ -131,8 +132,13 @@ const ItemContainer: React.FC = () => {
   const { data: item, isLoading } = apiClient.useGetItemQuery({ id: id! }, { skip: !id });
 
   return (
-    <>
-      <Button onClick={() => navigate('/')} variant={'outlined'} startIcon={<ChevronLeftSVG />} style={{ marginBottom: 24 }}>
+    <div className={styles.page}>
+      <Button
+        onClick={() => navigate('/')}
+        variant={'outlined'}
+        startIcon={<ChevronLeftSVG />}
+        style={{ width: 'max-content', marginBottom: 24 }}
+      >
         Список предметов
       </Button>
       {isLoading ? (
@@ -142,7 +148,7 @@ const ItemContainer: React.FC = () => {
       ) : (
         <Item item={item as ItemType} />
       )}
-    </>
+    </div>
   );
 };
 

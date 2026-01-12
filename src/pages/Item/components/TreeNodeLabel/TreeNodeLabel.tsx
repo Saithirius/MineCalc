@@ -1,22 +1,21 @@
-import React, { ReactNode, useId } from 'react';
+import React from 'react';
 import styles from './TreeNodeLabel.module.scss';
-import { Button, MinusSVG, PlusSVG, useModal } from 'skb_uikit';
+import { Button, MinusSVG, PlusSVG } from 'skb_uikit';
 import { ItemModal } from 'components/Modals/ItemModal/ItemModal';
 import { ItemType } from '../../Item';
+import { useItemModalSate } from 'hooks/useItemModalSate/useItemModalSate';
 
 export type Action = '--' | '-' | '+' | '++';
 
 type TreeNodeLabelProps = {
   item: ItemType;
-  name: ReactNode;
   targetAmount: number;
   onChangeAmount: (action: Action) => void;
   isRoot?: boolean;
 };
 
-export const TreeNodeLabel: React.FC<TreeNodeLabelProps> = ({ item, name, targetAmount, onChangeAmount, isRoot }) => {
-  const id = useId();
-  const editModalState = useModal(id + item.id + 'editItemModal');
+export const TreeNodeLabel: React.FC<TreeNodeLabelProps> = ({ item, targetAmount, onChangeAmount, isRoot }) => {
+  const editModalState = useItemModalSate(false, false);
 
   const label = `${item.name}: ${targetAmount % 1 != 0 ? targetAmount.toFixed(1) : targetAmount}`;
 

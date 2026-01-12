@@ -5,6 +5,8 @@ import { PageLayout } from './components/PageLayout/PageLayout';
 import { Items } from './pages/Items/Items';
 import { Item } from './pages/Item/Item';
 
+const isDev = import.meta.env.MODE === 'development';
+
 export const App: React.FC = () => {
   const { setTheme } = useContext(ThemeContext);
   setTheme('light');
@@ -19,7 +21,7 @@ export const App: React.FC = () => {
   }, []);
 
   return (
-    <BrowserRouter basename={'/MineCalc/'}>
+    <BrowserRouter basename={isDev ? '' : '/MineCalc/'}>
       <ModalProvider>
         <Routes>
           <Route element={<PageLayout />}>

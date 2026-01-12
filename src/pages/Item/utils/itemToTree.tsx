@@ -30,7 +30,6 @@ export const itemToTree: ItemToTree = withPath((item, targetAmount = 1, onChange
     label: (
       <TreeNodeLabel
         item={item}
-        name={item.name}
         targetAmount={targetAmount}
         onChangeAmount={(action: Action) => onChangeAmount(pathCopy, action)}
         isRoot={isRoot}

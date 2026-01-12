@@ -1,9 +1,10 @@
-import React, { useId } from 'react';
+import React, { useEffect } from 'react';
 import styles from './ItemModal.module.scss';
-import { Modal, useModal } from 'skb_uikit';
+import { Modal } from 'skb_uikit';
 import { Item } from 'types/items';
 import { EditItem } from './components/EditItem/EditItem';
 import { NewItem } from './components/NewItem/NewItem';
+import { useItemModalSate } from 'hooks/useItemModalSate/useItemModalSate';
 
 type ItemModalProps = {
   isOpen: boolean;
@@ -12,8 +13,7 @@ type ItemModalProps = {
 };
 
 export const ItemModal: React.FC<ItemModalProps> = ({ isOpen, onClose, item }) => {
-  const modalId = useId();
-  const newItemModalState = useModal(modalId);
+  const newItemModalState = useItemModalSate();
 
   return (
     <>

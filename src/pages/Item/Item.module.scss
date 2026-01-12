@@ -1,3 +1,10 @@
+.page {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .loader {
   width: 64px;
   height: 64px;
@@ -12,6 +19,11 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 24px;
+}
+
+.content {
+  height: 100%;
+  overflow: auto;
 }
 
 .ingredientsBlock {

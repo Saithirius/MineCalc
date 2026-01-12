@@ -48,6 +48,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({ onSave, defaultValues, foote
               autoComplete={'off'}
               containerClassName={styles.nameInput}
               error={!!formState?.errors?.name}
+              autoFocus
             />
           )}
         />

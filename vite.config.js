@@ -6,6 +6,8 @@ import svgr from 'vite-plugin-svgr';
 import checker from 'vite-plugin-checker';
 import circularDependency from 'vite-plugin-circular-dependency';
 
+const isDev = process.env.NODE_ENV === 'development';
+
 // Функция для поиска файла с учетом расширений
 function resolveAlias(basePaths) {
   return {
@@ -39,6 +41,16 @@ function resolveAlias(basePaths) {
   };
 }
 
+const htmlPlugin = () => {
+  return {
+    name: 'html-transform',
+    transformIndexHtml(html) {
+      if (isDev) return html;
+      return html.replace('<base href="/" />', '<base href="/MineCalc/" />');
+    },
+  };
+};
+
 export default defineConfig({
   base: './',
   server: {
@@ -70,6 +82,7 @@ export default defineConfig({
       svgrOptions: { exportType: 'default', ref: true, svgo: false, titleProp: true },
       include: '**/*.svg',
     }),
+    htmlPlugin(),
   ],
   resolve: {
     extensions: ['.tsx', '.ts', '.jsx', '.js'], // Добавляем расширения
