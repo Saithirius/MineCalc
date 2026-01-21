@@ -14,7 +14,7 @@ export type TreeProps = {
   isOpenDefault?: boolean;
 };
 
-export const Tree: React.FC<TreeProps> = ({ data, isRoot = true, isOpenDefault = true }) => {
+export const Tree: React.FC<TreeProps> = ({ data, isRoot = true, isOpenDefault = false }) => {
   const [isOpen, setIsOpen] = useState(isOpenDefault);
 
   const isHasChildren = !!data.children?.length;
